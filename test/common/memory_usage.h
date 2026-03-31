@@ -74,7 +74,8 @@ namespace utils {
         peakUsage
     };
 
-#if __unix__
+#if __unix__ && ! defined(__gnu_hurd__)
+
     inline unsigned LinuxKernelVersion()
     {
         unsigned digit1, digit2, digit3;
@@ -125,9 +126,11 @@ namespace utils {
                 break;
             }
         }
-        // VmPeak is available in kernels staring 2.6.15
+#if !defined(__gnu_hurd__)
+        // VmPeak is available in Linux kernels staring 2.6.15
         if (stat != peakUsage || LinuxKernelVersion() >= 2006015)
             ASSERT(size, "Invalid /proc/self/status format, pattern not found.");
+#endif
         fclose(fst);
         return size * 1024;
 #elif __APPLE__ && !__ARM_ARCH
